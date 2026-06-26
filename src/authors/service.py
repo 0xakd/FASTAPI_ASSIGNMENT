@@ -14,7 +14,7 @@ from src.errors import (
 
 class AuthorService:
 
-    # 🔹 helper: ensure user exists
+    # helper: ensure user exists
     async def _get_user_or_fail(self, author_id: uuid.UUID, session: AsyncSession):
         result = await session.execute(
             select(User).where(User.uid == author_id)
@@ -59,7 +59,7 @@ class AuthorService:
 
 
 
-    # 🔹 Get single author
+    # Get single author
     async def get_author(self, author_id: uuid.UUID, session: AsyncSession):
 
         user = await self._get_user_or_fail(author_id, session)
@@ -87,14 +87,14 @@ class AuthorService:
     # 🔹 Follow author
     async def follow_author(self, author_id, current_user, session):
 
-        # ✅ ensure author exists
+        # ensure author exists
         await self._get_user_or_fail(author_id, session)
 
-        # ❌ self-follow check
+        # self-follow check
         if current_user.uid == author_id:
             raise CannotFollowYourself()
 
-        # 🔍 check existing follow
+        # check existing follow
         existing = await session.execute(
             select(Follower).where(
                 Follower.follower_id == current_user.uid,
@@ -105,7 +105,7 @@ class AuthorService:
         if existing.scalar():
             raise AlreadyFollowing()
 
-        # ✅ create follow
+        # create follow
         follow = Follower(
             follower_id=current_user.uid,
             following_id=author_id
@@ -116,9 +116,9 @@ class AuthorService:
         return {"message": "Followed successfully"}
 
 
-    # 🔹 Unfollow author
+    # Unfollow author
     async def unfollow_author(self, author_id, current_user, session):
-        # ✅ ensure author exists
+        # ensure author exists
         await self._get_user_or_fail(author_id, session)
 
         result = await session.execute(

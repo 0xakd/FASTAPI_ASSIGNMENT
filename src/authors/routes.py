@@ -31,7 +31,7 @@ async def get_authors(
     authors = await author_service.get_authors(session)
     return {"authors": authors}
 
-#GET SINGLE AUTHOR
+# GET SINGLE AUTHOR
 @authors_router.get(
     "/{author_id}",
     response_model=AuthorModel,
@@ -47,7 +47,7 @@ async def get_author(
     return await author_service.get_author(author_id, session)
 
 
-# 🔹 Follow author (AUTH REQUIRED)
+# Follow author (AUTH REQUIRED)
 @authors_router.post(
     "/{author_id}/follow",
     response_model=FollowResponseModel,
@@ -70,7 +70,7 @@ async def follow_author(
     )
 
 
-# 🔹 Unfollow author (AUTH REQUIRED)
+# Unfollow author (AUTH REQUIRED)
 @authors_router.delete(
     "/{author_id}/follow",
     status_code=status.HTTP_204_NO_CONTENT

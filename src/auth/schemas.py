@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import List
+from typing import List, Literal
 
 from pydantic import BaseModel, Field
 
@@ -14,6 +14,7 @@ class UserCreateModel(BaseModel):
     username: str = Field(max_length=8)
     email: str = Field(max_length=40)
     password: str = Field(min_length=6)
+    role: Literal["user", "author"] = "user"
 
     model_config = {
         "json_schema_extra": {

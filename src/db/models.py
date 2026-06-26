@@ -36,6 +36,7 @@ class User(SQLModel, table=True):
         return f"<User {self.username}>"
 
 
+
 class BookTag(SQLModel, table=True):
     book_id: uuid.UUID = Field(default=None, foreign_key="books.uid", primary_key=True)
     tag_id: uuid.UUID = Field(default=None, foreign_key="tags.uid", primary_key=True)
