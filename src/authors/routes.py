@@ -9,10 +9,7 @@ from src.db.models import User
 from .service import AuthorService
 from .schemas import AuthorModel, AuthorListResponseModel, FollowResponseModel
 
-authors_router = APIRouter(
-    prefix="/authors",
-    tags=["authors"]
-)
+authors_router = APIRouter()
 
 author_service = AuthorService()
 
