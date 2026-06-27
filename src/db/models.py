@@ -170,14 +170,26 @@ class PostLike(SQLModel, table=True):
     
 class Comment(SQLModel, table=True):
     __tablename__ = "comments"
+
     uid: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     content: str
     user_uid: uuid.UUID = Field(foreign_key="users.uid")
     post_uid: uuid.UUID = Field(foreign_key="posts.uid")
-    parent_id: Optional[uuid.UUID] = Field(default=None, foreign_key="comments.uid")
+    parent_id: Optional[uuid.UUID] = Field(
+        default=None,
+        foreign_key="comments.uid"
+    )
+
     created_at: datetime = Field(default_factory=datetime.now)
     post: Optional[Post] = Relationship(back_populates="comments")
-    
+    parent: Optional["Comment"] = Relationship(
+        back_populates="replies",
+        sa_relationship_kwargs={"remote_side": "Comment.uid"}
+    )
+    replies: List["Comment"] = Relationship(
+        back_populates="parent",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+    )
     
     def __repr__(self):
         return f"<Comment {self.uid} post={self.post_uid}>"

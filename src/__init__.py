@@ -7,7 +7,8 @@ from src.tags.routes import tags_router
 from src.posts.routes import post_router
 from .errors import register_all_errors
 from .middleware import register_middleware
-
+from src.comments.routes import comments_router
+from src.likes.routes import like_router
 
 version = "v1"
 
@@ -47,3 +48,6 @@ app.include_router(review_router, prefix=f"{version_prefix}/reviews", tags=["rev
 app.include_router(tags_router, prefix=f"{version_prefix}/tags", tags=["tags"])
 app.include_router(authors_router, prefix=f"{version_prefix}/authors", tags=["authors"])
 app.include_router(post_router, prefix=f"{version_prefix}/posts", tags=["posts"])
+app.include_router(comments_router, prefix=f"{version_prefix}/posts", tags=["comments"])
+app.include_router(like_router, prefix=f"{version_prefix}/posts", tags=["likes"])
+

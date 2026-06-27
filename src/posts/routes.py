@@ -7,7 +7,7 @@ from src.auth.dependencies import AccessTokenBearer, RoleChecker
 from src.db.main import get_session
 from src.errors import PostNotFound, MaxImagesExceeded, CommentNotFound
 
-from .schemas import Post, PostCreateModel, PostUpdateModel
+from .schemas import Post, PostCreateModel, PostUpdateModel, PostDetailModel
 from .service import PostService
 
 post_router = APIRouter()
@@ -17,12 +17,21 @@ access_token_bearer = AccessTokenBearer()
 role_checker = Depends(RoleChecker(["admin", "author", "user"]))
 
 
-@post_router.get("/", response_model=List[Post], dependencies=[role_checker])
+@post_router.get("/", response_model=List[PostDetailModel], dependencies=[role_checker])
 async def get_posts(
     session: AsyncSession = Depends(get_session),
     _: dict = Depends(access_token_bearer),
 ):
-    return await post_service.get_all_posts(session)
+    posts = await post_service.get_all_posts(session)
+    
+    response = []
+    for post in posts:
+        data = PostDetailModel.model_validate(post)
+        data.likes_count = len(post.likes)
+        response.append(data)
+        
+    # return [PostDetailModel.model_validate(post) for post in posts]
+    return response
 
 
 @post_router.post("/", response_model=Post, status_code=status.HTTP_201_CREATED, dependencies=[role_checker])
@@ -41,7 +50,7 @@ async def create_post(
     return result
 
 
-@post_router.get("/{post_uid}", response_model=Post, dependencies=[role_checker])
+@post_router.get("/{post_uid}", response_model=PostDetailModel, dependencies=[role_checker])
 async def get_post(
     post_uid: str,
     session: AsyncSession = Depends(get_session),
@@ -52,7 +61,10 @@ async def get_post(
     if not post:
         raise PostNotFound()
 
-    return post
+    data = PostDetailModel.model_validate(post)
+    data.likes_count = len(post.likes)
+
+    return data
 
 
 @post_router.patch("/{post_uid}", response_model=Post, dependencies=[role_checker])

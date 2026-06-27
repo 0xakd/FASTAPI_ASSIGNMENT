@@ -6,17 +6,37 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.db.models import Post, PostImage, Comment, PostLike
 from .schemas import PostCreateModel, PostUpdateModel
-
+from sqlalchemy.orm import selectinload
 
 class PostService:
 
     async def get_all_posts(self, session: AsyncSession):
-        statement = select(Post).order_by(desc(Post.created_at))
+        statement = (
+            select(Post)
+                .options(
+                    selectinload(Post.images),
+                    selectinload(Post.comments),
+                    selectinload(Post.likes),
+                )
+                .order_by(desc(Post.created_at))
+            )
+
         result = await session.execute(statement)
-        return result.scalars().all()
+        posts =  result.unique().scalars().all()
+        
+        return posts
 
     async def get_post(self, post_uid: str, session: AsyncSession):
-        statement = select(Post).where(Post.uid == post_uid)
+        statement = (
+            select(Post)
+                .where(Post.uid == post_uid)
+                    .options(
+                    selectinload(Post.images),
+                    selectinload(Post.comments),
+                    selectinload(Post.likes),
+                ) 
+        )
+        
         result = await session.execute(statement)
         return result.scalar_one_or_none()
 
@@ -62,28 +82,6 @@ class PostService:
         await session.delete(post)
         await session.commit()
         # return True
-
-    async def like_post(self, post_uid: str, user_uid: str, session: AsyncSession):
-        like = PostLike(user_uid=user_uid, post_uid=post_uid)
-        session.add(like)
-        await session.commit()
-        return like
-
-    async def unlike_post(self, post_uid: str, user_uid: str, session: AsyncSession):
-        statement = select(PostLike).where(
-            PostLike.post_uid == post_uid,
-            PostLike.user_uid == user_uid,
-        )
-
-        result = await session.exec(statement)
-        like = result.first()
-
-        if not like:
-            return None
-
-        await session.delete(like)
-        await session.commit()
-        return {}
 
     async def add_comment(self, post_uid: str, user_uid: str, content: str, parent_id, session: AsyncSession):
         # validate parent (optional)
