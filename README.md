@@ -17,12 +17,12 @@ Ensure you have the following installed:
 ### Project Setup
 1. Clone the project repository:
     ```bash
-    git clone https://github.com/0xakd/FASTAPI_ASSIGNMENT.git
+    git clone https://github.com/0xakd/fastapi_backend_assignment.git
     ```
    
 2. Navigate to the project directory:
     ```bash
-    cd FASTAPI_ASSIGNMENT/
+    cd fastapi_backend_assignment/
     ```
 
 3. Create and activate a virtual environment:
